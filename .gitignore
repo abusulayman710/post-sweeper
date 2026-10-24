@@ -1,0 +1,25 @@
+# Gradle cache and locks
+.gradle/
+build/
+app/build/
+
+# Local configuration file (contains local SDK path)
+local.properties
+
+# Android Studio and IntelliJ IDEA
+.idea/
+*.iml
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Binaries and packages
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Post Sweeper</string>
+    <string name="widget_small_name">Sweeper · Progress</string>
+    <string name="widget_wide_name">Sweeper · Dashboard</string>
+    <string name="widget_large_name">Sweeper · Full</string>
+    <string name="widget_small_desc">Deletion progress at a glance.</string>
+    <string name="widget_wide_desc">Progress, rate-limit status and pause/resume.</string>
+    <string name="widget_large_desc">Progress, window budget, per-type counts and recent deletions.</string>
+</resources>
