@@ -15,14 +15,6 @@ It operates safely in the background at a pace X tolerates, adapts dynamically t
 
 ---
 
-<p align="center">
-  <img src="docs/assets/dashboard-mockup.svg" width="31%" alt="Dashboard screen" />
-  <img src="docs/assets/filters-mockup.svg" width="31%" alt="Filter rules screen" />
-  <img src="docs/assets/widgets-mockup.svg" width="31%" alt="Android glance widgets" />
-</p>
-
----
-
 ## Key Features
 
 * **Dry-Run Preview Mode**: Simulate any sweep without sending deletion requests to X. Inspect exactly which posts match your filters before committing.
