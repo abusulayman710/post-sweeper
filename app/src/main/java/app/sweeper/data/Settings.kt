@@ -176,6 +176,7 @@ data class GeneralConfig(
     val resumeAfterReboot: Boolean = true,
     val logKeep: Int = 3000,
     val apiOrigin: String = "https://x.com",
+    val dryRun: Boolean = false,
 )
 
 @Serializable

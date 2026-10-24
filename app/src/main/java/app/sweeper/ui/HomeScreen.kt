@@ -17,9 +17,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,6 +49,7 @@ import app.sweeper.data.AttentionKind
 import app.sweeper.data.Desired
 import app.sweeper.data.PostType
 import app.sweeper.data.RunPhase
+import app.sweeper.net.UpdateStatus
 import app.sweeper.ui.theme.Good
 import app.sweeper.ui.theme.Warn
 import kotlinx.coroutines.delay
@@ -69,6 +78,7 @@ fun HomeScreen(vm: MainViewModel) {
     val will by vm.willDelete.collectAsStateWithLifecycle()
     val account by vm.account.collectAsStateWithLifecycle()
     val settings by vm.settings.collectAsStateWithLifecycle()
+    val updateStatus by vm.updateStatus.collectAsStateWithLifecycle()
     val now by rememberNow()
     var confirm by remember { mutableStateOf(false) }
     var confirmLogout by remember { mutableStateOf(false) }
@@ -95,6 +105,35 @@ fun HomeScreen(vm: MainViewModel) {
                     Text("@${account?.account?.handle ?: ""}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 TextButton(onClick = { confirmLogout = true }) { Text("Log out") }
+            }
+        }
+
+        if (updateStatus is UpdateStatus.Available) {
+            val info = (updateStatus as UpdateStatus.Available).info
+            item {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Update Available: ${info.tagName}", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                            IconButton(onClick = { vm.dismissUpdate() }) {
+                                Icon(Icons.Filled.Close, contentDescription = "Dismiss")
+                            }
+                        }
+                        Text("A new release of PostSweeper is available on GitHub.", style = MaterialTheme.typography.bodyMedium)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            PrimaryButton("Download APK", Modifier.weight(1f)) {
+                                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.apkDownloadUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            }
+                            GhostButton("Release Notes", Modifier.weight(1f)) {
+                                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.htmlUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -130,6 +169,24 @@ fun HomeScreen(vm: MainViewModel) {
                     if (snap.attention == AttentionKind.LOGIN) Text("Log out and log back in to refresh the session.", style = MaterialTheme.typography.bodySmall)
                 }
 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Dry run preview", fontWeight = FontWeight.SemiBold)
+                        Text(
+                            if (settings.general.dryRun) "Simulation active: preview matches without deleting" else "Live mode: deletions will permanently erase posts",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (settings.general.dryRun) Warn else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = settings.general.dryRun,
+                        onCheckedChange = { vm.setDryRun(it) }
+                    )
+                }
+
                 Spacer(Modifier.height(2.dp))
                 when (snap.desired) {
                     Desired.ACTIVE -> Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -143,7 +200,9 @@ fun HomeScreen(vm: MainViewModel) {
                     Desired.STOPPED -> Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         GhostButton(if (counts.total == 0) "Scan my posts" else "Rescan", Modifier.weight(1f)) { vm.scan() }
                         PrimaryButton(
-                            if (canDelete) "Delete ${nf.format(will + queued)}" else "Nothing to delete",
+                            if (!canDelete) "Nothing to delete"
+                            else if (settings.general.dryRun) "Preview ${nf.format(will + queued)} (Dry Run)"
+                            else "Delete ${nf.format(will + queued)}",
                             Modifier.weight(1f), enabled = canDelete,
                         ) { if (settings.general.confirmBeforeStart) confirm = true else vm.startDeleting() }
                     }
@@ -228,16 +287,18 @@ fun HomeScreen(vm: MainViewModel) {
 
     if (confirm) {
         val n = will + queued
+        val isDry = settings.general.dryRun
         AlertDialog(
             onDismissRequest = { confirm = false },
-            title = { Text("Delete ${nf.format(n)} items?") },
+            title = { Text(if (isDry) "Run simulation preview ($n items)?" else "Delete ${nf.format(n)} items?") },
             text = {
                 Text(
-                    "This cannot be undone. At the current pace it takes about ${fmtDur(etaFor(n))}. " +
+                    if (isDry) "Dry run mode will test all your filter rules and queue matching posts without sending any delete requests to X. Zero posts will be deleted."
+                    else "This cannot be undone. At the current pace it takes about ${fmtDur(etaFor(n))}. " +
                         "It keeps going in the background and each item is only counted after X confirms it is gone.",
                 )
             },
-            confirmButton = { TextButton({ confirm = false; vm.startDeleting() }) { Text("Start") } },
+            confirmButton = { TextButton({ confirm = false; vm.startDeleting() }) { Text(if (isDry) "Run preview" else "Start") } },
             dismissButton = { TextButton({ confirm = false }) { Text("Cancel") } },
         )
     }

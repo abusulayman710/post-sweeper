@@ -210,6 +210,7 @@ fun SettingsScreen(vm: MainViewModel, openLogs: () -> Unit) {
                 ChoiceRow("Theme", listOf(ThemeMode.SYSTEM to "System", ThemeMode.LIGHT to "Light", ThemeMode.DARK to "Dark"), s.general.theme, { v -> general { it.copy(theme = v) } })
                 SwitchRow("Dynamic colour", "Use your wallpaper colours on Android 12+.", s.general.dynamicColor) { v -> general { it.copy(dynamicColor = v) } }
                 SwitchRow("Confirm before starting", checked = s.general.confirmBeforeStart) { v -> general { it.copy(confirmBeforeStart = v) } }
+                SwitchRow("Dry run preview mode", "Simulate sweeps without sending any delete requests to X.", s.general.dryRun) { v -> general { it.copy(dryRun = v) } }
                 Hint("Widgets: long-press the home screen, Widgets, Post Sweeper. Three sizes: progress, dashboard with pause/resume, and full.")
             }
         }
@@ -227,6 +228,7 @@ fun SettingsScreen(vm: MainViewModel, openLogs: () -> Unit) {
         item {
             Section("Diagnostics", "Logs and connection tools") {
                 GhostButton("View activity log", Modifier.fillMaxWidth()) { openLogs() }
+                GhostButton("Check for updates", Modifier.fillMaxWidth()) { vm.checkUpdate(manual = true) }
                 GhostButton("Test connection", Modifier.fillMaxWidth()) { vm.testConnection() }
                 GhostButton("Refresh X endpoints", Modifier.fillMaxWidth()) { vm.refreshEndpoints() }
                 SliderRow("Keep log lines", s.general.logKeep, 500..20000, { v -> general { it.copy(logKeep = v) } }, step = 500)

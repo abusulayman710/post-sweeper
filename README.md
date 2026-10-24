@@ -15,8 +15,18 @@ It operates safely in the background at a pace X tolerates, adapts dynamically t
 
 ---
 
+<p align="center">
+  <img src="docs/assets/dashboard-mockup.svg" width="31%" alt="Dashboard screen" />
+  <img src="docs/assets/filters-mockup.svg" width="31%" alt="Filter rules screen" />
+  <img src="docs/assets/widgets-mockup.svg" width="31%" alt="Android glance widgets" />
+</p>
+
+---
+
 ## Key Features
 
+* **Dry-Run Preview Mode**: Simulate any sweep without sending deletion requests to X. Inspect exactly which posts match your filters before committing.
+* **In-App Update Checker**: Directly queries GitHub releases on startup so you are alerted immediately when X endpoint fixes or app updates drop.
 * **Multi-Content Sweeping**: Target posts, replies, reposts, quotes, and likes independently or all together.
 * **Independent Read Verification**: Unlike naive scripts that assume HTTP 200 means success, PostSweeper queries `TweetResultByRestId` after every operation. A post is marked deleted only when confirmed gone (or a tombstone is returned).
 * **The Rate-Limit Governor (`RateGovernor.kt`)**:
@@ -82,6 +92,9 @@ app/src/main/java/app/sweeper/
 3. Open PostSweeper and tap **Log In**.
 4. Log into your X account in the official web view.
 5. Configure your filters and pacing profile, then start the sweep.
+
+### IzzyOnDroid / F-Droid
+PostSweeper includes standard Fastlane metadata (`fastlane/metadata/android/en-US`) for community repositories. See [IZZYON_DROID_SUBMISSION.md](IZZYON_DROID_SUBMISSION.md) for inclusion details.
 
 ---
 

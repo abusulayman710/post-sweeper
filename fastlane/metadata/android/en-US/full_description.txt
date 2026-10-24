@@ -1,0 +1,12 @@
+PostSweeper is an open-source Android privacy tool that autonomously cleans up your own X (Twitter) profile directly from your mobile device.
+
+Key Features:
+• Sweep your original posts, replies, reposts, quotes, and likes.
+• Independent verification: an item is only marked as deleted after an independent read confirms it is gone.
+• Adaptive rate governor: respects X's rate-limit headers and paces requests with randomized jitter to prevent automation flags.
+• Zero credential storage: log in via official in-app browser; passwords and cookies are never stored outside Android's encrypted private storage.
+• Dry-run preview mode: test filters and preview exactly what would be deleted without sending any deletion requests.
+• Deep filter engine: filter by age, date ranges, engagement count (protect popular posts), keywords, media attachments, and custom keep-lists.
+• Official archive import: bypass the ~3,200 live timeline limit by importing your official X archive file.
+• Foreground background execution and interactive Home screen widgets.
+• Zero telemetry, zero analytics, zero external tracking servers.

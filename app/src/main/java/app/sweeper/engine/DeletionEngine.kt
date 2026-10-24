@@ -67,12 +67,12 @@ class DeletionEngine(
         scheduleBreather()
         when (mode) {
             RunMode.SCAN -> scanPhase(fresh) ?: Exit.Done
-            RunMode.DELETE -> deletePhase()
+            RunMode.DELETE -> if (cfg.general.dryRun) dryRunPhase() else deletePhase()
             RunMode.SCAN_DELETE -> {
                 val s = scanPhase(fresh)
                 if (s != null) s else {
                     dao.queueMatching()
-                    deletePhase()
+                    if (cfg.general.dryRun) dryRunPhase() else deletePhase()
                 }
             }
         }
@@ -343,6 +343,16 @@ class DeletionEngine(
 
     private fun short(p: PostEntity) = p.text.replace('\n', ' ').take(40).ifBlank { p.id }
 
+    private suspend fun dryRunPhase(): Exit {
+        dao.recoverDeleting()
+        val rem = dao.remaining()
+        val will = dao.willDelete()
+        val total = rem + will
+        setPhase(RunPhase.IDLE, "Dry run preview: $total posts matched filters (0 deleted)")
+        AppLog.i("DryRun", "Dry run simulation finished. $total items matched filter rules (none deleted).")
+        return Exit.Done
+    }
+
     private suspend fun deletePhase(): Exit {
         dao.recoverDeleting()
         val rem0 = dao.remaining()
@@ -469,7 +479,6 @@ class DeletionEngine(
             TweetState.Unavailable -> return if (cfg.verify.unavailableIsGone) V.Gone else V.Still
             is TweetState.Present -> {}
         }
-        if (s1 !is TweetState.Present) return V.Still
         return when (p.type) {
             PostType.LIKE -> if (s1.favorited == false) V.Gone else V.Still
             PostType.REPOST -> {

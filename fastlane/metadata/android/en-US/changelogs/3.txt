@@ -1,0 +1,6 @@
+• Complete open-source release.
+• Updated X GraphQL & Relay timeline endpoint resolution.
+• Added self-healing candidate fallback loops for 404 resilience.
+• Added dry-run preview simulation mode.
+• Added in-app GitHub update checker.
+• Added foreground service resilience and Glance widgets.

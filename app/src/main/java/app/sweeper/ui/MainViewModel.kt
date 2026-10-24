@@ -17,6 +17,8 @@ import app.sweeper.data.RunSnapshot
 import app.sweeper.data.Settings
 import app.sweeper.engine.ArchiveImporter
 import app.sweeper.engine.FilterEngine
+import app.sweeper.net.UpdateChecker
+import app.sweeper.net.UpdateStatus
 import app.sweeper.service.ServiceController
 import app.sweeper.widget.WidgetUpdater
 import kotlinx.coroutines.Dispatchers
@@ -79,10 +81,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _toast = MutableSharedFlow<String>(extraBufferCapacity = 8)
     val toast: SharedFlow<String> = _toast
 
+    val updateStatus = MutableStateFlow<UpdateStatus?>(null)
+
     @Volatile
     private var verifyingLogin = false
 
     init {
+        viewModelScope.launch(Dispatchers.IO) {
+            checkUpdate(manual = false)
+        }
         viewModelScope.launch {
             Graph.settings.flow.map { it.filter }.distinctUntilChanged().debounce(500).collect {
                 withContext(Dispatchers.Default) { FilterEngine.recompute() }
@@ -335,5 +342,27 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 .append('"').append(it.text.replace("\"", "\"\"").replace("\n", " ")).append("\"\n")
         }
         sb.toString()
+    }
+
+    fun checkUpdate(manual: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val status = UpdateChecker.check(app.sweeper.BuildConfig.VERSION_NAME)
+            updateStatus.value = status
+            if (manual) {
+                when (status) {
+                    is UpdateStatus.Available -> say("Update ${status.info.tagName} available!")
+                    is UpdateStatus.UpToDate -> say("PostSweeper is up to date (v${app.sweeper.BuildConfig.VERSION_NAME})")
+                    is UpdateStatus.Error -> say("Update check: ${status.error}")
+                }
+            }
+        }
+    }
+
+    fun dismissUpdate() {
+        updateStatus.value = null
+    }
+
+    fun setDryRun(enabled: Boolean) {
+        update { it.copy(general = it.general.copy(dryRun = enabled)) }
     }
 }
