@@ -1,5 +1,8 @@
 # PostSweeper
 
+[![Download APK v3.0](https://img.shields.io/badge/Download%20APK-v3.0%20(Latest)-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abusulayman710/post-sweeper/releases/download/v3.0/PostSweeper-3.0.apk)
+[![All Releases](https://img.shields.io/badge/Releases-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/abusulayman710/post-sweeper/releases)
+
 [![Android CI](https://github.com/abusulayman710/post-sweeper/actions/workflows/android.yml/badge.svg)](https://github.com/abusulayman710/post-sweeper/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Android](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026%2B)-green.svg)](https://developer.android.com)
@@ -71,7 +74,10 @@ app/src/main/java/app/sweeper/
 ## Getting Started
 
 ### Sideloading the APK
-1. Download the latest `PostSweeper-3.0.apk` from the [Releases](https://github.com/abusulayman710/post-sweeper/releases) page.
+
+[![Download PostSweeper v3.0 APK](https://img.shields.io/badge/Download%20PostSweeper%20v3.0%20APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/abusulayman710/post-sweeper/releases/download/v3.0/PostSweeper-3.0.apk)
+
+1. Click the button above to download `PostSweeper-3.0.apk` directly (or visit [Releases](https://github.com/abusulayman710/post-sweeper/releases)).
 2. Transfer and install on your Android device (Android 8.0+ / API 26+).
 3. Open PostSweeper and tap **Log In**.
 4. Log into your X account in the official web view.
